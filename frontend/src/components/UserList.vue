@@ -1,10 +1,23 @@
 <template>
     <div>
-      <h1 class="page-title">Lista de Usuários</h1>
-      <div class="search-container">
-        <label for="search">Buscar:</label>
-        <input type="text" v-model="searchTerm" @input="fetchUsers" id="search">
+        <h1 class="page-title">Lista de Usuários</h1>
+  <div class="form-container">
+    <form @submit.prevent="fetchUsers">
+      <div class="form-group">
+        <label for="name_search">Nome:</label>
+        <input class="form-control" type="text" v-model="searchTerm" id="search">
       </div>
+      <div class="form-group">
+        <label for="cpf">CPF:</label>
+        <input class="form-control" type="text" v-model="cpfSearchTerm" id="cpf">
+      </div>
+      <div class="form-group">
+        <label  for="created"> Data de Cadastro:</label>
+        <input class="form-control" type="date" v-model="createdSearchTerm" id="created">
+      </div>
+      <button type="submit" class="submit-button">Buscar</button>
+    </form>
+ </div>
       <div class="table-container">
         <table class="table table-striped table-lg">
           <thead>
@@ -45,7 +58,7 @@
       <div v-if="successMessage" class="alert alert-success">
         {{ successMessage }}
       </div>
-    </div>
+  </div>
   </template>
   
   <script>
@@ -66,18 +79,38 @@
     },
     methods: {
       fetchUsers() {
-        axios.get('http://localhost:8000/api/users', {
-          params: { search: this.searchTerm }
-        })
-          .then(response => {
-            this.users = response.data;
-            this.fetchProfiles();
-          })
-          .catch(error => {
-            this.errorMessage = 'Ocorreu um erro ao buscar os usuários.';
-            console.error(error);
-          });
-      },
+    const params = {};
+
+    if (this.searchTerm) {
+      params.nome = this.searchTerm;
+    }
+
+    if (this.cpfSearchTerm) {
+      params.cpf = this.cpfSearchTerm;
+    }
+
+    if (this.createdSearchTerm) {
+      params.periodo = {
+        start: this.createdSearchTerm,
+        end: this.createdSearchTerm
+      };
+    }
+
+    axios.get('http://localhost:8000/api/users/', {
+      params: params
+    })
+      .then(response => {
+        this.users = response.data;
+        this.fetchProfiles();
+      })
+      .catch(error => {
+        this.errorMessage = 'Ocorreu um erro ao buscar os usuários.';
+        console.error(error);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  },
       fetchProfiles() {
         axios.get('http://localhost:8000/api/profiles')
           .then(response => {
@@ -119,15 +152,46 @@
     },
   };
   </script>
-  
-  
   <style>
-  .page-title {
+ .page-title {
   text-align: center;
-  margin-top: 100px; 
-  margin-bottom: 100px; 
+  margin-top: 100px;
+  margin-bottom: 20px;
 }
-  /* Estilos do componente */
+.form-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 1000px;
+  margin: 0 auto;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-right: 10px;
+}
+
+.form-control {
+  width: 200px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  
+}
+.submit-button {
+  background-color: green;
+  color: white;
+  font-size: 20px;
+  padding: 10px 20px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto;
+}
+ 
   .table {
     width: 100%;
     border-collapse: collapse;
@@ -152,15 +216,6 @@
     background-color: rgba(0, 0, 0, 0);
   }
   
-  .search-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .search-container label {
-    margin-right: 10px;
-  }
   
   .table-container {
     width: 100%;

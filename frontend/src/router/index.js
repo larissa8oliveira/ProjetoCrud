@@ -43,6 +43,11 @@ const routes = [
     name: 'showUser',
     component: ShowUser,
   },
+  {
+    path: '/users/search',
+    name: 'UserLists',
+    component:UserList ,
+  },
 ];
 
 const router = createRouter({

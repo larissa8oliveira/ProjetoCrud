@@ -1,91 +1,99 @@
 <template>
-    <div>
-      <h1 class="page-title">Editar Usuário</h1>
-      <div class="form-container">
+  <div>
+    <h1 class="page-title">Editar Usuário</h1>
+    <div class="form-container">
       <form @submit.prevent="updateUser">
         <div class="form-group">
           <label for="name">Nome:</label>
           <input type="text" v-model="user.nome" id="name" class="form-control">
+          <span v-if="errors.nome" class="error-message">{{ errors.nome[0] }}</span>
         </div>
         <div class="form-group">
           <label for="email">Email:</label>
           <input type="email" v-model="user.email" id="email" class="form-control">
+          <span v-if="errors.email" class="error-message">{{ errors.email[0] }}</span>
         </div>
         <div class="form-group">
           <label for="cpf">CPF:</label>
           <input type="text" v-model="user.cpf" id="cpf" class="form-control">
+          <span v-if="errors.cpf" class="error-message">{{ errors.cpf[0] }}</span>
         </div>
         <div class="form-group">
           <label for="perfil">Perfil:</label>
           <select v-model="user.perfil_id" id="perfil" class="form-control">
             <option v-for="perfil in perfis" :key="perfil.id" :value="perfil.id">{{ perfil.name }}</option>
           </select>
+          <span v-if="errors.perfil_id" class="error-message">{{ errors.perfil_id[0] }}</span>
         </div>
         <button type="submit" class="submit-button">Salvar</button>
       </form>
     </div>
-    </div>
-  </template>
-  
-  <script>
-  import axios from 'axios';
-  
-  export default {
-    data() {
-      return {
-        user: {
-          nome: '',
-          email: '',
-          cpf: '',
-          perfil_id: '',
-        },
-        perfis: [], // Lista de perfis de usuário
-      };
-    },
-    mounted() {
-      this.fetchPerfis();
-      this.fetchUser();
-    },
-    methods: {
-      fetchPerfis() {
-        axios.get('http://localhost:8000/api/profiles')
-          .then(response => {
-            this.perfis = response.data;
-          })
-          .catch(error => {
-            console.error(error);
-          });
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      user: {
+        nome: '',
+        email: '',
+        cpf: '',
+        perfil_id: '',
       },
-      fetchUser() {
-        const userId = this.$route.params.id;
-        axios.get(`http://localhost:8000/api/users/${userId}`)
-          .then(response => {
-            this.user = response.data;
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      },
-      updateUser() {
-        const userId = this.$route.params.id;
-        axios.put(`http://localhost:8000/api/users/${userId}`, this.user)
-          .then(response => {
-            // Atualize os dados do usuário
-            this.user = response.data;
-  
-            // Redirecione para a tela inicial
-            this.$router.push({ name: 'Home' });
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      },
+      perfis: [], 
+      errors: {}, 
+    };
+  },
+  mounted() {
+    this.fetchPerfis();
+    this.fetchUser();
+  },
+  methods: {
+    fetchPerfis() {
+      axios.get('http://localhost:8000/api/profiles')
+        .then(response => {
+          this.perfis = response.data;
+        })
+        .catch(error => {
+          console.error(error);
+        });
     },
-  };
-  </script>
+    fetchUser() {
+      const userId = this.$route.params.id;
+      axios.get(`http://localhost:8000/api/users/${userId}`)
+        .then(response => {
+          this.user = response.data;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    updateUser() {
+      const userId = this.$route.params.id;
+      axios.put(`http://localhost:8000/api/users/${userId}`, this.user)
+        .then(response => {
+          // Atualize os dados do usuário
+          this.user = response.data;
+
+          // Redirecione para a tela inicial
+          this.$router.push({ name: 'Home' });
+        })
+        .catch(error => {
+          if (error.response && error.response.status === 422) {
+            this.errors = error.response.data.errors;
+          } else {
+            console.error(error);
+          }
+        });
+    },
+  },
+};
+</script>
   
   <style scoped>
-  /* Estilos do componente */
   .form-group {
     margin-bottom: 1rem;
   }
@@ -134,6 +142,10 @@
   display: block;
   margin: 20px auto;
 }
-  
+.error-message {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
   </style>
   

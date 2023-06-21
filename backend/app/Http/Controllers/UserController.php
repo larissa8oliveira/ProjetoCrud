@@ -6,12 +6,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use LaravelLegends\PtBrValidator\Rules\CPF;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = User::get();
+        $users = User::all();
 
         return response()->json($users);
     }
@@ -21,7 +22,11 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'nome' => 'required',
             'email' => 'required|email|unique:users',
-            'cpf' => 'required|numeric|digits:11|unique:users',
+            'cpf' => [
+                'required',
+                new CPF(),
+                'unique:users',
+            ],
             'perfil_id' => 'required|exists:profiles,id',
         ]);
 
@@ -46,28 +51,28 @@ class UserController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $user = User::find($id);
+{
+    $user = User::find($id);
 
-        if (!$user) {
-            return response()->json(['message' => 'Usuário não encontrado'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'nome' => 'required',
-            'email' => 'required|email|unique:users,email,' . $id,
-            'cpf' => 'required|numeric|digits:11|unique:users,cpf,' . $id,
-            'perfil_id' => 'required|exists:profiles,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['message' => 'Erro de validação', 'errors' => $validator->errors()], 422);
-        }
-
-        $user->update($request->all());
-
-        return response()->json($user);
+    if (!$user) {
+        return response()->json(['message' => 'Usuário não encontrado'], 404);
     }
+
+    $validator = Validator::make($request->all(), [
+        'nome' => 'required',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'cpf' => 'required|numeric|digits:11|unique:users,cpf,' . $id,
+        'perfil_id' => 'required|exists:profiles,id',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['message' => 'Erro de validação', 'errors' => $validator->errors()], 422);
+    }
+
+    $user->update($request->all());
+
+    return response()->json($user);
+}
 
     public function destroy($id)
     {
@@ -95,12 +100,12 @@ class UserController extends Controller
         }
 
         if (!empty($cpf)) {
-            $query->where('cpf', 'LIKE', '%' . $cpf . '%');
+            $query->where('cpf', $cpf);
         }
 
         if (!empty($periodo)) {
-            $start = $periodo['start'];
-            $end = $periodo['end'];
+            $start = Carbon::parse($periodo['start'])->startOfDay();
+            $end = Carbon::parse($periodo['end'])->endOfDay();
             $query->whereBetween('created_at', [$start, $end]);
         }
 
