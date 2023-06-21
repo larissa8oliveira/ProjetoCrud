@@ -10,13 +10,35 @@ use LaravelLegends\PtBrValidator\Rules\CPF;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        $users = User::all();
+    public function index(Request $request)
+{
+    $nome = $request->input('nome');
+    $cpf = $request->input('cpf');
+    $periodo = $request->input('periodo');
 
-        return response()->json($users);
+    $query = User::query();
+
+    if (!empty($nome)) {
+        $query->where(function ($query) use ($nome) {
+            $query->where('nome', 'LIKE', '%' . $nome . '%')
+                ->orWhere('nome', '=', $nome);
+        });
     }
 
+    if (!empty($cpf)) {
+        $query->where('cpf', $cpf);
+    }
+
+    if (!empty($periodo)) {
+        $start = Carbon::parse($periodo['start'])->startOfDay();
+        $end = Carbon::parse($periodo['end'])->endOfDay();
+        $query->whereBetween('created_at', [$start, $end]);
+    }
+
+    $users = $query->get();
+
+    return response()->json($users);
+}
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -87,30 +109,5 @@ class UserController extends Controller
         return response()->json(['message' => 'Usuário excluído com sucesso']);
     }
 
-    public function search(Request $request)
-    {
-        $nome = $request->input('nome');
-        $cpf = $request->input('cpf');
-        $periodo = $request->input('periodo');
 
-        $query = User::query();
-
-        if (!empty($nome)) {
-            $query->where('nome', 'LIKE', '%' . $nome . '%');
-        }
-
-        if (!empty($cpf)) {
-            $query->where('cpf', $cpf);
-        }
-
-        if (!empty($periodo)) {
-            $start = Carbon::parse($periodo['start'])->startOfDay();
-            $end = Carbon::parse($periodo['end'])->endOfDay();
-            $query->whereBetween('created_at', [$start, $end]);
-        }
-
-        $users = $query->get();
-
-        return response()->json($users);
-    }
 }

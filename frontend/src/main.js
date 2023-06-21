@@ -1,11 +1,12 @@
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import Multiselect from 'vue-multiselect';
 
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
+const app = createApp(App);
 
+app.component('multiselect', Multiselect);
 
-const app = createApp(App)
+app.use(router);
 
-app.use(router)
-
-app.mount('#app')
+app.mount('#app');
