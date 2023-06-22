@@ -10,6 +10,8 @@ class Address extends Model
         'street',
         'city',
         'state',
+        'zip',
+        'user_id',
     ];
 
     public function user()

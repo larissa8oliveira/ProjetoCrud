@@ -5,9 +5,21 @@ import ProfileCreate from '../components/ProfileCreate.vue';
 import AddressCreate from '../components/AddressCreate.vue';
 import EditUserComponent from '../components/EditUserComponent.vue';
 import ShowUser from '../components/ShowUser.vue';
+import AddressList from '../components/AddressList.vue';
+import EditAddressComponent from '../components/EditAddressComponent.vue'
 
 
 const routes = [
+  {
+    path: '/addresses',
+    name: 'AddressList',
+    component: AddressList, 
+  },
+  {
+    path: '/edit-address/:id',
+    name: 'editAddress',
+    component: EditAddressComponent
+  },
   {
     path: '/',
     name: 'Home',

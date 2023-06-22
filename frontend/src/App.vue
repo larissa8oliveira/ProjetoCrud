@@ -3,12 +3,14 @@
     <nav class="navbar">
       <div class="navbar-links">
         <router-link to="/users">Usuários</router-link>
-        <span class="navbar-space"></span> <!-- Espaço entre os itens -->
+        <span class="navbar-space"></span> 
         <router-link to="/users/create">Cadastrar Usuário</router-link>
-        <span class="navbar-space"></span> <!-- Espaço entre os itens -->
+        <span class="navbar-space"></span> 
         <router-link to="/profiles/create">Cadastrar Perfil</router-link>
-        <span class="navbar-space"></span> <!-- Espaço entre os itens -->
+        <span class="navbar-space"></span> 
         <router-link to="/addresses/create">Cadastrar Endereço</router-link>
+        <span class="navbar-space"></span> 
+        <router-link to="/addresses">Endereço</router-link>
       </div>
     </nav>
     <router-view />

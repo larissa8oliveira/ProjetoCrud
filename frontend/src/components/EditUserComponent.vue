@@ -25,7 +25,7 @@
           </select>
           <span v-if="errors.perfil_id" class="error-message">{{ errors.perfil_id[0] }}</span>
         </div>
-        <button type="submit" class="submit-button">Salvar</button>
+        <button type="submit" class="submit-button">Atualizar</button>
       </form>
     </div>
   </div>
@@ -74,11 +74,9 @@ export default {
     updateUser() {
       const userId = this.$route.params.id;
       axios.put(`http://localhost:8000/api/users/${userId}`, this.user)
-        .then(response => {
-          // Atualize os dados do usuário
+        .then(response => {          
           this.user = response.data;
 
-          // Redirecione para a tela inicial
           this.$router.push({ name: 'Home' });
         })
         .catch(error => {

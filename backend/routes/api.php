@@ -17,6 +17,9 @@ Route::get('/profiles/{id}', [ProfileController::class, 'show']);
 Route::post('/profiles', [ProfileController::class, 'store']);
 
 Route::get('/addresses', [AddressController::class, 'index']);
-Route::get('/addresses/{id}', [AddressController::class, 'show']);
 Route::post('/addresses', [AddressController::class, 'store']);
+Route::put('/addresses/{id}', [AddressController::class, 'update']);
+Route::get('/addresses/{id}', [AddressController::class, 'show']);
+
+
 
